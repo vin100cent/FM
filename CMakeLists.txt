@@ -13,7 +13,7 @@ include(PamplejuceMacOS)
 # This is the internal name of the project and the name of JUCE's shared code target
 # Note: This cannot have spaces (it may be 2024, but you can't have it all!)
 # Worry not, JUCE's PRODUCT_NAME can have spaces (and is what DAWs display)
-set(PROJECT_NAME "Pamplejuce")
+set(PROJECT_NAME VinnySynth)
 
 # Worry not, JUCE's PRODUCT_NAME can have spaces (and is what DAWs will display)
 # You can also just have it be the same thing as PROJECT_NAME
@@ -21,13 +21,13 @@ set(PROJECT_NAME "Pamplejuce")
 #   set(PROJECT_NAME "MyPlugin_v${MAJOR_VERSION}")
 # Doing so enables major versions to show up in IDEs and DAWs as separate plugins
 # allowing you to change parameters and behavior without breaking existing user projects
-set(PRODUCT_NAME "Pamplejuce Demo")
+set(PRODUCT_NAME "Vinny Synth 1.0")
 
 # Change me! Used for the MacOS bundle name and Installers
-set(COMPANY_NAME "Pamplejuce Company")
+set(COMPANY_NAME vincentwav)
 
 # Change me! Used for the MacOS bundle identifier (and signing)
-set(BUNDLE_ID "com.pamplejuce.pamplejuce")
+set(BUNDLE_ID "com.${COMPANY_NAME}.${PROJECT_NAME}")
 
 # Change me! Set the plugin formats you want built
 # Valid choices: AAX Unity VST VST3 AU AUv3 Standalone
@@ -51,6 +51,8 @@ add_subdirectory(JUCE)
 # This adds the melatonin inspector module
 add_subdirectory (modules/melatonin_inspector)
 
+
+
 # See `docs/CMake API.md` in the JUCE repo for all config options
 juce_add_plugin("${PROJECT_NAME}"
     # Icons for the standalone app
@@ -66,12 +68,12 @@ juce_add_plugin("${PROJECT_NAME}"
     # Change me!
     # A four-character plugin id
     # First character MUST be uppercase for AU formats
-    PLUGIN_MANUFACTURER_CODE Pamp
+    PLUGIN_MANUFACTURER_CODE Viny
 
     # Change me!
     # A unique four-character plugin id
     # Note: this must have at least one upper-case character
-    PLUGIN_CODE P001
+    PLUGIN_CODE V001
     FORMATS "${FORMATS}"
 
     # The name of your final executable
@@ -89,11 +91,25 @@ add_library(SharedCode INTERFACE)
 target_compile_features(SharedCode INTERFACE cxx_std_20)
 
 # Manually list all .h and .cpp files for the plugin
+
 # If you are like me, you'll use globs for your sanity.
 # Just ensure you employ CONFIGURE_DEPENDS so the build system picks up changes
 # If you want to appease the CMake gods and avoid globs, manually add files like so:
 # set(SourceFiles Source/PluginEditor.h Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginProcessor.cpp)
-file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h")
+file(GLOB_RECURSE
+        SourceFiles
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/data/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/data/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/dsp/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/dsp/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/ui/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/ui/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/presets/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/presets/*.h")
+
 target_sources(SharedCode INTERFACE ${SourceFiles})
 
 # Adds a BinaryData target for embedding assets into the binary
@@ -105,8 +121,10 @@ include(XcodePrettify)
 # This is where you can set preprocessor definitions for JUCE and your plugin
 target_compile_definitions(SharedCode
     INTERFACE
+        PROJECT_NAME=${PROJECT_NAME}
+        COMPANY_NAME=${COMPANY_NAME}
 
-    # JUCE_WEB_BROWSER and JUCE_USE_CURL off by default
+        # JUCE_WEB_BROWSER and JUCE_USE_CURL off by default
     JUCE_WEB_BROWSER=0  # If you set this to 1, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
     JUCE_USE_CURL=0     # If you set this to 1, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -119,7 +137,7 @@ target_compile_definitions(SharedCode
     VERSION="${CURRENT_VERSION}"
 
     # JucePlugin_Name is for some reason doesn't use the nicer PRODUCT_NAME
-    PRODUCT_NAME_WITHOUT_VERSION="Pamplejuce"
+    PRODUCT_NAME_WITHOUT_VERSION="VinnySynth"
 )
 
 # Link to any other modules you added (with juce_add_module) here!
@@ -131,6 +149,7 @@ target_link_libraries(SharedCode
     INTERFACE
     Assets
     melatonin_inspector
+
     juce_audio_utils
     juce_audio_processors
     juce_dsp
@@ -141,7 +160,9 @@ target_link_libraries(SharedCode
     juce::juce_recommended_warning_flags)
 
 # Link the JUCE plugin targets our SharedCode target
-target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)
+target_link_libraries("${PROJECT_NAME}"
+        PRIVATE SharedCode
+        cppzmq)
 
 # IPP support, comment out to disable
 include(PamplejuceIPP)
@@ -154,3 +175,7 @@ include(Benchmarks)
 
 # Pass some config to GA (like our PRODUCT_NAME)
 include(GitHubENV)
+
+#find cppzmq wrapper, installed by make of cppzmq
+find_package(cppzmq)
+target_link_libraries(${PROJECT_NAME} PRIVATE )
