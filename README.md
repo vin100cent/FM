@@ -5,6 +5,9 @@ This synthesizer is a FM-Synthesizer or frequency modulation synthesizer.
 In FM synthesis a "carrier" wave gets modulated or sculpted by another wave
 to create a new sound. [More on FM Synthesis](https://en.wikipedia.org/wiki/Frequency_modulation_synthesis)
 
+This is a great synthesizer for learning some FM synthesis basics without all the complexity of a full FM synth.
+It builds into a VST3 and AU plugin so you can use it in any DAW!
+
 I created this synthesizer to learn about standard frameworks in music
 production software, as well as C++, GUIs, microservices, and project
 management with a teammate. _technologies used:_
