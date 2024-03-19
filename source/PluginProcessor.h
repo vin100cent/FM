@@ -40,7 +40,6 @@ public:
     bool isMidiEffect() const override;
     double getTailLengthSeconds() const override;
 
-    //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
@@ -53,16 +52,12 @@ public:
 
     //====Undo/Redo Functions=======================================================
 
-    void undo();
-    void redo();
-    void captureState();
 
     PresetManager& getPresetManager() { return *presetManager; }
     juce::AudioProcessorValueTreeState apvts;
 private:
     std::unique_ptr<PresetManager> presetManager;
     juce::Synthesiser synth;
-    std::stack<juce::ValueTree> undoStack, redoStack;
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
 
     //==============================================================================

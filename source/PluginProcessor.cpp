@@ -223,37 +223,6 @@ VinceSynthAudioProcessor::VinceSynthAudioProcessor()
         apvts.replaceState(newTree);
 
     }
-    //====Undo Redo=================================================================
-
-    void VinceSynthAudioProcessor::captureState()
-    {
-        //stack to track user changes
-        auto currentState = apvts.copyState();
-        undoStack.push(currentState);
-
-        //Clear
-        while (!redoStack.empty()) redoStack.pop();
-    }
-
-    void VinceSynthAudioProcessor::undo()
-    {
-        if (undoStack.empty()) return;
-
-        auto stateUndo = undoStack.top();
-        undoStack.pop();
-        redoStack.push(apvts.copyState());
-        apvts.replaceState(stateUndo);
-    }
-
-    void VinceSynthAudioProcessor::redo()
-    {
-        if (redoStack.empty()) return;
-
-        auto stateRedo = redoStack.top();
-        redoStack.pop();
-        redoStack.push(apvts.copyState());
-        apvts.replaceState(stateRedo);
-    }
 
     //==============================================================================
 

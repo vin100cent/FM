@@ -75,6 +75,9 @@ juce_add_plugin("${PROJECT_NAME}"
     # Note: this must have at least one upper-case character
     PLUGIN_CODE V001
     FORMATS "${FORMATS}"
+        IS_SYNTH ON
+        NEEDS_MIDI_INPUT ON
+        EDITOR_WANTS_KEYBOARD_FOCUS ON
 
     # The name of your final executable
     # This is how it's listed in the DAW
